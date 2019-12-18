@@ -6,6 +6,7 @@ import com.rcplatformhk.userpoolserver.service.impl.RedisCacheQueue;
 import com.rcplatformhk.userpoolserver.service.impl.RedisDelayQueue;
 import com.rcplatformhk.userpoolserver.service.impl.RedisUserPool;
 import com.rcplatformhk.userpoolserver.sink.Sink;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
@@ -16,6 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Component
+@Slf4j
 public class ExecutorStarter implements ApplicationListener<ContextRefreshedEvent> {
 
     @Autowired
@@ -35,12 +37,14 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
+            log.info("rules init start...");
             //chainRuleServer.init();
+            log.info("rules init complete...");
             for (int i = 0; i < size; i++) {
                 String cacheName = "cache_queue_pop_thread_" + i;
                 String queueName = "delay_queue_pop_thread" + i;
                 start_cache_queue_pop_thread(cacheName);
-                start_delay_queue_pop_thread(queueName);
+//                start_delay_queue_pop_thread(queueName);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -7,12 +7,14 @@ import com.rcplatformhk.userpoolserver.pojo.UserInfo;
 import com.rcplatformhk.userpoolserver.config.ConfigDto;
 import com.rcplatformhk.userpoolserver.rule.Rule;
 import com.rcplatformhk.userpoolserver.utils.DateUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
 
 @Component
+@Slf4j
 public class ChainRuleServer {
 
     @Resource

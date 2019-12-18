@@ -9,6 +9,7 @@ import com.rcplatformhk.userpoolserver.pojo.UserInfo;
 import com.rcplatformhk.userpoolserver.service.impl.RedisDelayQueue;
 import com.rcplatformhk.userpoolserver.service.impl.RedisUserPool;
 import com.rcplatformhk.userpoolserver.utils.SpringContextUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Slf4j
 class UserpoolServerApplicationTests {
 
     @Autowired
@@ -44,7 +46,9 @@ class UserpoolServerApplicationTests {
 
     @Test
     void testRedis(){
-        redisDelayQueue.put(UserInfo.builder().updateTime("2019-12-17 12:00:00").build());
+        long l = redisTemplate.opsForList().rightPush("h","1234");
+        String p = (String) redisTemplate.opsForList().leftPop("h");
+        System.out.println(p);
     }
 
     @Test
@@ -58,4 +62,8 @@ class UserpoolServerApplicationTests {
         rcVideoRecordOddMapper.getLiveChatStatisticsByUserIdAndRequestType(null,648);
     }
 
+    @Test
+    void testLog(){
+        log.info("test log");
+    }
 }

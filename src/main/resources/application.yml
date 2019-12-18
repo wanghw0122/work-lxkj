@@ -13,9 +13,9 @@ spring:
     password:
     lettuce:
       pool:
-        max-active: 8
+        max-active: 12
         max-wait: 1
-        max-idle: 8
+        max-idle: 12
         min-idle: 0
     timeout: 15000
     commandTimeout: 5000

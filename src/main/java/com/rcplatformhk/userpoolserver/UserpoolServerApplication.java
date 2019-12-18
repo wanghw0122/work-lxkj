@@ -75,8 +75,7 @@ public class UserpoolServerApplication implements CommandLineRunner {
             SingleOutputStreamOperator<UserInfo> map = source.filter(new FilterFunction<Protobuf3.DuckulaEvent>() {
                 @Override
                 public boolean filter(Protobuf3.DuckulaEvent value) throws Exception {
-                    //todo 增加filter
-                    return true;
+                    return value.getOptType().name().equals("update") || value.getOptType().name().equals("insert");
                 }
             }).map((MapFunction<Protobuf3.DuckulaEvent, UserInfo>)
                     e -> Map2ObjectUtil.mapToObject(e.getAfterMap(), UserInfo.class))
