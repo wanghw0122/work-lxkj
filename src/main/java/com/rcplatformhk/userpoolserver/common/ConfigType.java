@@ -35,11 +35,12 @@ public enum ConfigType {
 
     public static void init() throws Exception {
         rcQuickChatConfigMapper = SpringContextUtil.getBean(RcQuickChatConfigMapper.class);
-        for(ConfigType configType : ConfigType.values()){
-         configType.initialize(rcQuickChatConfigMapper);
+        for (ConfigType configType : ConfigType.values()) {
+            configType.initialize(rcQuickChatConfigMapper);
         }
     }
-    public void initialize(RcQuickChatConfigMapper rcQuickChatConfigMapper) throws Exception{
+
+    public void initialize(RcQuickChatConfigMapper rcQuickChatConfigMapper) throws Exception {
         List<RcQuickChatConfigEntity> rcQuickChatConfigEntities = rcQuickChatConfigMapper.getConfigByType(this.type);
         if (!CollectionUtil.isNullOrEmpty(rcQuickChatConfigEntities)) {
             RcQuickChatConfigEntity rcQuickChatConfigEntity = rcQuickChatConfigEntities.get(0);
@@ -47,8 +48,7 @@ public enum ConfigType {
             Optional<ConfigDto> optional = SerializeUtils.deserialize(configText, this.clazz);
             if (!optional.isPresent())
                 throw new ConfigInitException("Init Config Error! Type : " + this.msg);
-            this.configDto =  optional.get();
-        }
-        throw new ConfigInitException("No Config Error! Type : " + this.msg);
+            this.configDto = optional.get();
+        } else throw new ConfigInitException("No Config Error! Type : " + this.msg);
     }
 }
