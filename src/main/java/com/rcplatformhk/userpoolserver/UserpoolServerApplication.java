@@ -6,6 +6,7 @@ import com.rcplatformhk.userpoolserver.utils.Map2ObjectUtil;
 import com.rcplatformhk.userpoolserver.utils.SerializeUtils;
 import com.rcplatformhk.userpoolserver.utils.SpringContextUtil;
 import com.twitter.chill.protobuf.ProtobufSerializer;
+import lombok.extern.slf4j.Slf4j;
 import net.wicp.tams.common.Conf;
 import net.wicp.tams.common.apiext.IOUtil;
 import net.wicp.tams.common.flink.source.binlog.BinlogSource;
@@ -15,6 +16,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
+import org.apache.flink.shaded.curator.org.apache.curator.shaded.com.google.common.collect.Maps;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -34,6 +36,7 @@ import org.springframework.cache.annotation.EnableCaching;
 @SpringBootApplication
 @EnableCaching
 @MapperScan("com.rcplatformhk.userpoolserver.dao.mapper")
+@Slf4j
 public class UserpoolServerApplication implements CommandLineRunner {
 
     private static final String CQ = "CACHE_QUEUE";
@@ -72,13 +75,11 @@ public class UserpoolServerApplication implements CommandLineRunner {
             //监控binlog
             DataStream<Protobuf3.DuckulaEvent> source = env.addSource(new BinlogSource());
             //转换bean对象
-            SingleOutputStreamOperator<UserInfo> map = source.filter(new FilterFunction<Protobuf3.DuckulaEvent>() {
-                @Override
-                public boolean filter(Protobuf3.DuckulaEvent value) throws Exception {
-                    return value.getOptType().name().equals("update") || value.getOptType().name().equals("insert");
-                }
-            }).map((MapFunction<Protobuf3.DuckulaEvent, UserInfo>)
-                    e -> Map2ObjectUtil.mapToObject(e.getAfterMap(), UserInfo.class))
+            SingleOutputStreamOperator<UserInfo> map = source.filter(
+                    (FilterFunction<Protobuf3.DuckulaEvent>) value -> value.getOptType().name().equals("update")
+                    || value.getOptType().name().equals("insert"))
+                    .map((MapFunction<Protobuf3.DuckulaEvent, UserInfo>)
+                    e -> Map2ObjectUtil.mapToObject(Maps.newHashMap(e.getAfterMap()), UserInfo.class))
                     .filter((FilterFunction<UserInfo>) value -> value.getGender() == 1);
             FlinkJedisPoolConfig conf = new FlinkJedisPoolConfig.Builder().setHost("127.0.0.1").setPort(6379).build();
             map.addSink(new RedisSink<>(conf, new RedisExampleMapper()));

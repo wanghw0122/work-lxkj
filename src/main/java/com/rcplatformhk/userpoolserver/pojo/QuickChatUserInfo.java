@@ -2,10 +2,7 @@ package com.rcplatformhk.userpoolserver.pojo;
 
 import com.rcplatformhk.userpoolserver.annotation.Default;
 import com.rcplatformhk.userpoolserver.annotation.FieldType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -14,6 +11,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class QuickChatUserInfo {
     @FieldType(field = "id")
     @NotNull

@@ -1,25 +1,19 @@
 package com.rcplatformhk.userpoolserver.service.impl;
 
 import com.google.common.collect.Lists;
-import com.mysql.jdbc.StringUtils;
 import com.rcplatformhk.userpoolserver.pojo.UserInfo;
 import com.rcplatformhk.userpoolserver.service.Queue;
-import com.rcplatformhk.userpoolserver.service.UserPool;
 import com.rcplatformhk.userpoolserver.utils.SerializeUtils;
 import io.netty.util.internal.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundListOperations;
-import org.springframework.data.redis.core.BoundZSetOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import scala.Predef;
 
 import javax.annotation.PostConstruct;
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -45,17 +39,18 @@ public class RedisCacheQueue implements Queue {
         int i = 0;
         while (i < n) {
             try {
-                String o = (String) boundListOperations.leftPop(10, TimeUnit.SECONDS);
+                String o = (String) boundListOperations.leftPop();
                 if (StringUtil.isNullOrEmpty(o)) {
                     Thread.yield();
                     continue;
                 }
-                log.info(String.format("thread : %s pop Object : %s", Thread.currentThread().getName(), o));
-                Optional<UserInfo> optionalUserInfo = SerializeUtils.deserialize((String) o, UserInfo.class);
+                log.info(MessageFormat.format("thread : {0}, pop Object : {1}", Thread.currentThread().getName(), o));
+                Optional<UserInfo> optionalUserInfo = SerializeUtils.deserialize(o, UserInfo.class);
                 list.add(optionalUserInfo);
                 ++i;
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(MessageFormat.format("thread : {0}, pop Object Error:{2}",
+                        Thread.currentThread().getName(), e.getMessage()), e);
             }
         }
         return list;

@@ -66,4 +66,8 @@ class UserpoolServerApplicationTests {
     void testLog(){
         log.info("test log");
     }
+
+    @Test
+    void print(){
+    }
 }

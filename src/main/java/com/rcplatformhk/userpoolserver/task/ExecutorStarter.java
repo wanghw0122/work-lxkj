@@ -38,13 +38,13 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
             log.info("rules init start...");
-            //chainRuleServer.init();
+            chainRuleServer.init();
             log.info("rules init complete...");
             for (int i = 0; i < size; i++) {
                 String cacheName = "cache_queue_pop_thread_" + i;
                 String queueName = "delay_queue_pop_thread" + i;
                 start_cache_queue_pop_thread(cacheName);
-//                start_delay_queue_pop_thread(queueName);
+                start_delay_queue_pop_thread(queueName);
             }
         } catch (Exception e) {
             e.printStackTrace();

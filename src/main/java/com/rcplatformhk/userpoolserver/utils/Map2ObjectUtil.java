@@ -4,15 +4,19 @@ import com.mysql.jdbc.StringUtils;
 import com.rcplatformhk.userpoolserver.annotation.Default;
 import com.rcplatformhk.userpoolserver.annotation.FieldType;
 import com.rcplatformhk.userpoolserver.common.MapToObjectException;
+import com.rcplatformhk.userpoolserver.pojo.UserInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
+@Slf4j
 public class Map2ObjectUtil {
-    public static <T> T mapToObject(Map<String, String> map, Class<T> beanClass) throws Exception {
+    public static <T> T mapToObject(Map<String, Object> map, Class<T> beanClass) throws Exception {
         if (map == null)
             return null;
         try {
@@ -38,7 +42,6 @@ public class Map2ObjectUtil {
             }
             ValidationUtils.ValidationResult validationResult = ValidationUtils.validateEntity(obj);
             if (validationResult.isHasErrors()) {
-                //todo log errors
                 String msg = validationResult.getErrorMsg().toString();
                 throw new MapToObjectException("MapToObjectException Error! Msg: " + msg);
             }
@@ -65,18 +68,28 @@ public class Map2ObjectUtil {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T cast2Object(Class<T> clazz, String str) throws Exception {
-        if (StringUtils.isNullOrEmpty(str))
+    private static <T> T cast2Object(Class<T> clazz, Object object) throws Exception {
+        if (Objects.isNull(object))
             return null;
-        if (String.class.equals(clazz)) {
-            return (T) String.valueOf(str);
-        } else if (Integer.class.equals(clazz)) {
-            return (T) Integer.valueOf(str);
-        } else if (Float.class.equals(clazz)) {
-            return (T) Float.valueOf(str);
-        } else if (Boolean.class.equals(clazz)) {
-            return (T) Boolean.valueOf(str);
+        if (object instanceof String) {
+            if (String.class.equals(clazz))
+                return (T) String.valueOf(object);
+            if (Integer.class.equals(clazz))
+                return (T) Integer.valueOf((String) object);
+            if (Boolean.class.equals(clazz))
+                return (T) Boolean.valueOf((String) object);
+            if (Float.class.equals(clazz))
+                return (T) Float.valueOf((String) object);
+            else
+                throw new RuntimeException("Class Not Found!  Class: " + clazz.getName());
         }
-        throw new RuntimeException("Class Not Found!  Class: " + clazz.getName());
+        return (T) object;
+    }
+
+
+    public static void main(String[] args) throws Exception {
+        UserInfo u = UserInfo.builder().updateTime("2018-12-12 00:00:00").build();
+
+        System.out.println(objectToMap(u));
     }
 }

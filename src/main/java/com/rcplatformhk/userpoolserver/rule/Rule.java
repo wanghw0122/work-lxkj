@@ -6,14 +6,17 @@ import com.rcplatformhk.userpoolserver.task.Task;
 import com.rcplatformhk.userpoolserver.service.Behavior;
 import com.rcplatformhk.userpoolserver.service.Checker;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.shaded.curator.org.apache.curator.shaded.com.google.common.collect.Maps;
 import org.apache.flink.util.CollectionUtil;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -73,6 +76,23 @@ public class Rule {
         }
     }
 
+    @Override
+    public String toString() {
+        AtomicInteger i = new AtomicInteger(0);
+        return this.name +
+                "{" +
+                exportTables.values().stream().map(sets -> "check" + i.incrementAndGet() + "(" +
+                        sets[0].stream()
+                                .map(Rule::toString)
+                                .collect(Collectors.joining(",", "[", "]")) +
+                        ";" +
+                        sets[1].stream()
+                                .map(Rule::toString)
+                                .collect(Collectors.joining(",", "[", "]")) +
+                        ")").collect(Collectors.joining(",")) +
+                "}";
+    }
+
     private Set<Rule> checkList(Task task) {
         Set<Rule> sets = Sets.newHashSet();
         if (exportTables == null) return sets;
@@ -80,7 +100,8 @@ public class Rule {
             if (type == RuleType.SYN) {
                 sets = exportTables.entrySet().stream()
                         .filter(entry -> Objects.nonNull(entry.getKey()))
-                        .map(checkerEntry -> checkerEntry.getKey().check(task) ? checkerEntry.getValue()[0] : checkerEntry.getValue()[1])
+                        .map(checkerEntry -> checkerEntry.getKey().check(task) ? checkerEntry.getValue()[0]
+                                : checkerEntry.getValue()[1])
                         .filter(collection -> !CollectionUtil.isNullOrEmpty(collection))
                         .flatMap(Collection::stream)
                         .collect(Collectors.toSet());
@@ -194,14 +215,16 @@ public class Rule {
             this.exportTables.entrySet().stream().forEach(checkerEntry -> {
                 if (!CollectionUtil.isNullOrEmpty(rules0))
                     checkerEntry.getValue()[0].addAll(rules0);
-                else
+                if (!CollectionUtil.isNullOrEmpty(rules1))
                     checkerEntry.getValue()[1].addAll(rules1);
             });
             return this;
         }
 
         public Builder addAllCheckerRule(Rule rule0, Rule rule1) {
-            return addAllCheckerRules(Sets.newHashSet(rule0), Sets.newHashSet(rule1));
+            Set<Rule> rules0 = rule0 == null ? null : Sets.newHashSet(rule0);
+            Set<Rule> rules1 = rule1 == null ? null : Sets.newHashSet(rule1);
+            return addAllCheckerRules(rules0, rules1);
         }
 
         public Builder beforeAction(boolean beforeAction) {

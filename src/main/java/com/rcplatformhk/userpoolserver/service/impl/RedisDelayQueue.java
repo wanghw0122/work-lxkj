@@ -5,17 +5,21 @@ import com.rcplatformhk.userpoolserver.pojo.UserInfo;
 import com.rcplatformhk.userpoolserver.service.Queue;
 import com.rcplatformhk.userpoolserver.utils.DateUtil;
 import io.netty.util.internal.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
+import scala.Predef;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Slf4j
 public class RedisDelayQueue implements Queue, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -54,6 +58,7 @@ public class RedisDelayQueue implements Queue, Serializable {
             Set set = (Set) list.get(1);
             if (p == 0L) return null;
             else assert set != null && q >= 1L;
+            log.info(MessageFormat.format("========================>>> DELAY_QUEUE POP OBJECT {0} SUCCESS! <<<========================",set));
             set.stream().filter(Objects::nonNull).forEach(o -> {
                 ZSetOperations.TypedTuple typedTuple1 =  (ZSetOperations.TypedTuple)o;
                 UserInfo userInfo = (UserInfo) typedTuple1.getValue();
@@ -82,17 +87,18 @@ public class RedisDelayQueue implements Queue, Serializable {
         int l = userInfos.length;
         try {
             for (UserInfo userInfo : userInfos) {
-                //TODO log
                 if (StringUtil.isNullOrEmpty(userInfo.getUpdateTime()))
                     return false;
                 ZSetOperations.TypedTuple<Object> typedTuple = new DefaultTypedTuple<>(userInfo, (double) DateUtil.parseToTimeStemp(userInfo.getUpdateTime()));
                 typedTupleSet.add(typedTuple);
+                log.info(MessageFormat.format("========================>>> typedTupleSet.add({0}) <<<========================",userInfo));
             }
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
         Long res = boundZSetOperations.add(typedTupleSet);
+        log.info(MessageFormat.format("========================>>> DELAY_QUEUE ADD OBJECT {0} SUCCESS <<<========================",userInfos));
         return l == res;
     }
 }

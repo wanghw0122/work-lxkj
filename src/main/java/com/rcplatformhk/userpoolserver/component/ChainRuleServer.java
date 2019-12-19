@@ -1,10 +1,8 @@
 package com.rcplatformhk.userpoolserver.component;
 
-import com.rcplatformhk.userpoolserver.common.ConfigType;
 import com.rcplatformhk.userpoolserver.dao.mapper.*;
 import com.rcplatformhk.userpoolserver.task.Task;
 import com.rcplatformhk.userpoolserver.pojo.UserInfo;
-import com.rcplatformhk.userpoolserver.config.ConfigDto;
 import com.rcplatformhk.userpoolserver.rule.Rule;
 import com.rcplatformhk.userpoolserver.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +31,12 @@ public class ChainRuleServer {
     private static int[] poolId = {1, 2, 3};
 
     public void init() throws Exception {
-        //新老用户规则
-        ConfigType.init();
-        //新老用户规则
-        ConfigDto newUserConfigDto = ConfigType.NEWUSER_IN_CONFIG.getConfigDto();
-        ConfigDto olderUserUnpaidConfigDto = ConfigType.OLDFREEUSER_IN_CONFIG.getConfigDto();
-        ConfigDto olderUserPaidConfigDto = ConfigType.OLDPAYUSER_IN_CONFIG.getConfigDto();
+//        //新老用户规则
+//        ConfigType.init();
+//        //新老用户规则
+//        ConfigDto newUserConfigDto = ConfigType.NEWUSER_IN_CONFIG.getConfigDto();
+//        ConfigDto olderUserUnpaidConfigDto = ConfigType.OLDFREEUSER_IN_CONFIG.getConfigDto();
+//        ConfigDto olderUserPaidConfigDto = ConfigType.OLDPAYUSER_IN_CONFIG.getConfigDto();
 
         //todo 更新配置信息
         Rule new_user_saver = Rule.builder().name("new_user_saver").save().behavior(task -> {
@@ -139,12 +137,13 @@ public class ChainRuleServer {
         old_user_check_pay.getBuilder()
                 .bindFalseCheckRule(old_user_paid_check_pay_by_hours)
                 .bindTrueCheckRule(old_user_paid_saver);
+        log.info("RULE STRUCTURE : {}", root);
         root.gc();
     }
 
 
     @SuppressWarnings("unchecked")
     public void start(Task task) throws Exception {
-       root.flow(task);
+        root.flow(task);
     }
 }

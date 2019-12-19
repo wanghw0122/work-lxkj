@@ -62,4 +62,16 @@ public class UserInfo {
     private Float stone;
     @FieldType(field = "stone_version")
     private Integer stoneVersion;
+    @FieldType(field = "introduce")
+    private String introduce;
+    @FieldType(field = "eroticism_behavior")
+    private Integer eroticismBehavior;
+    @FieldType(field = "sign_eroticism")
+    private Integer signEroticism;
+    @FieldType(field = "channel")
+    private Integer channel;
+    @FieldType(field = "is_agent")
+    private Integer isAgent;
+    @FieldType(field = "agent_email")
+    private String agentEmail;
 }
