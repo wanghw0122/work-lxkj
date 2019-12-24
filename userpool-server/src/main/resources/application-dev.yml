@@ -1,11 +1,11 @@
 mybatis:
   type-aliases-package: com.rcplatformhk.userpoolserver.com.rcplatformhk.us.dao.entity
 spring:
-  datasource:
-    driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://39.100.73.91:3306/rc_video_chat?useUnicode=true&characterEncoding=utf-8&useSSL=false
-    username: root
-    password: rc_2019_good
+#  datasource:
+#    driverClassName: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://39.100.73.91:3306/rc_video_chat?useUnicode=true&characterEncoding=utf-8&useSSL=false
+#    username: root
+#    password: rc_2019_good
   redis:
     database: 0
     host: localhost
@@ -19,6 +19,15 @@ spring:
         min-idle: 0
     timeout: 15000
     commandTimeout: 5000
+datasource:
+  jdbc:
+    driverClassName: com.mysql.jdbc.Driver
+    url_major: jdbc:mysql://127.0.0.1:3306/test
+    username_major: root
+    password_major: 123456
+    url_secondary: jdbc:mysql://39.100.73.91:3306/test
+    username_secondary: root
+    password_secondary: rc_2019_good
 thread:
   size: 4
 logging:
