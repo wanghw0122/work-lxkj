@@ -57,7 +57,7 @@ public class RedisDelayQueue implements Queue, Serializable {
             Set set = (Set) list.get(1);
             if (p == 0L) return null;
             else assert set != null && q >= 1L;
-            log.info(MessageFormat.format("========================>>> DELAY_QUEUE POP OBJECT {0} SUCCESS! <<<========================",set));
+            log.info(MessageFormat.format("========================>>> DELAY_QUEUE THREAD {0} POP OBJECT {1} SUCCESS! <<<========================",Thread.currentThread().getName(),set));
             set.stream().filter(Objects::nonNull).forEach(o -> {
                 ZSetOperations.TypedTuple typedTuple1 =  (ZSetOperations.TypedTuple)o;
                 UserInfo userInfo = (UserInfo) typedTuple1.getValue();
@@ -65,7 +65,7 @@ public class RedisDelayQueue implements Queue, Serializable {
                 res.put(userInfo,score);
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(MessageFormat.format("========================>>> DELAY_QUEUE THREAD {0} POP OBJECT ERROR!! MSG:{1} <<<========================",Thread.currentThread().getName(),e.getMessage(),e));
         }
         return res;
     }
@@ -90,14 +90,14 @@ public class RedisDelayQueue implements Queue, Serializable {
                     return false;
                 ZSetOperations.TypedTuple<Object> typedTuple = new DefaultTypedTuple<>(userInfo, (double) DateUtil.parseToTimeStemp(userInfo.getUpdateTime()));
                 typedTupleSet.add(typedTuple);
-                log.info(MessageFormat.format("========================>>> typedTupleSet.add({0}) <<<========================",userInfo));
+                log.info(MessageFormat.format("========================>>> thread : {0} typedTupleSet.add({1}) <<<========================",Thread.currentThread().getName(),userInfo));
             }
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
         Long res = boundZSetOperations.add(typedTupleSet);
-        log.info(MessageFormat.format("========================>>> DELAY_QUEUE ADD OBJECT {0} SUCCESS <<<========================",userInfos));
+        log.info(MessageFormat.format("========================>>> DELAY_QUEUE THREAD {0} ADD OBJECT {1} SUCCESS! <<<========================", Thread.currentThread().getName(), userInfos));
         return l == res;
     }
 }

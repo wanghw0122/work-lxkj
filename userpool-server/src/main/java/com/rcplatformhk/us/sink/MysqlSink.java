@@ -22,6 +22,7 @@ public class MysqlSink implements Sink<Task> {
     @Override
     public void sink(Task task) {
         QuickChatUserInfo userInfo = null;
+        log.info("start sink task {}",task.getUserInfo());
         try {
             userInfo = getUserInfoFromTask(task);
             int l = rcQuickChatUserPoolService.insertQuickChatUserInfo(userInfo);

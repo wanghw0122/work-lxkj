@@ -1,5 +1,6 @@
 package com.rcplatformhk.us.service.impl;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.google.common.collect.Lists;
 import com.rcplatformhk.pojo.UserInfo;
 import com.rcplatformhk.us.service.Queue;
@@ -43,13 +44,12 @@ public class RedisCacheQueue implements Queue {
                     Thread.yield();
                     continue;
                 }
-                log.info(MessageFormat.format("thread : {0}, pop Object : {1}", Thread.currentThread().getName(), o));
-                Optional<UserInfo> optionalUserInfo = SerializeUtils.deserialize(o, UserInfo.class);
+                log.info(MessageFormat.format("========================>>> CACHE_QUEUE THREAD {0} POP OBJECT {1} SUCCESS! <<<========================", Thread.currentThread().getName(), o));
+                Optional<UserInfo> optionalUserInfo = SerializeUtils.deserialize(o, UserInfo.class, PropertyNamingStrategy.LOWER_CAMEL_CASE);
                 list.add(optionalUserInfo);
                 ++i;
             } catch (Exception e) {
-                log.error(MessageFormat.format("thread : {0}, pop Object Error:{2}",
-                        Thread.currentThread().getName(), e.getMessage()), e);
+                log.error(MessageFormat.format("========================>>> CACHE_QUEUE THREAD {0} POP OBJECT ERROR!! MSG:{1} <<<========================", Thread.currentThread().getName(), e.getMessage(), e));
             }
         }
         return list;
