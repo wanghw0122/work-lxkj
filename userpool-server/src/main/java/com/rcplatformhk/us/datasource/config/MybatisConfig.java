@@ -48,7 +48,7 @@ public class MybatisConfig {
 
 
     /**
-     * 创建 local环境 dataSource
+     * 创建主数据源
      * @throws Exception
      */
     @Bean(name="dataSourceMajor")
@@ -62,8 +62,7 @@ public class MybatisConfig {
     }
 
     /**
-     * 创建 回归环境 dataSource
-     * @throws Exception
+     * 创建次数据源
      */
     @Bean(name="dataSourceSecondary")
     public DataSource dataSourceStaging() throws Exception{

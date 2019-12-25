@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Builder
 @Data
-public class OldFreeUserOutConfigDto implements Serializable {
+public class OldFreeUserOutConfigDto extends ConfigDto implements Serializable {
 
     @NotNull(message = "videoCount1 can not be null")
     @Min(1)

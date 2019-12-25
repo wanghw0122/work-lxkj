@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Builder
 @Data
-public class NewUserInConfigDto implements Serializable {
+public class NewUserInConfigDto extends ConfigDto implements Serializable {
 
     @NotNull(message = "minuteDelay can not be null")
     @Min(1)

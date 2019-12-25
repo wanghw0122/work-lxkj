@@ -1,7 +1,8 @@
 package com.rcplatformhk.us.component;
 
 import com.rcplatformhk.pojo.UserInfo;
-import com.rcplatformhk.us.dao.mapper.*;
+import com.rcplatformhk.us.common.ConfigType;
+import com.rcplatformhk.us.config.*;
 import com.rcplatformhk.us.dao.service.*;
 import com.rcplatformhk.us.rule.Rule;
 import com.rcplatformhk.us.task.Task;
@@ -33,26 +34,36 @@ public class ChainRuleServer {
 
     private static int[] poolId = {1, 2, 3};
 
-    public void init() throws Exception {
-//        //新老用户规则
-//        ConfigType.init();
-//        //新老用户规则
-//        ConfigDto newUserConfigDto = ConfigType.NEWUSER_IN_CONFIG.getConfigDto();
-//        ConfigDto olderUserUnpaidConfigDto = ConfigType.OLDFREEUSER_IN_CONFIG.getConfigDto();
-//        ConfigDto olderUserPaidConfigDto = ConfigType.OLDPAYUSER_IN_CONFIG.getConfigDto();
+    public void init() throws Exception{
 
-        //todo 更新配置信息
+        ConfigType.init();
+
+        NewUserInConfigDto newUserInConfigDto = (NewUserInConfigDto)ConfigType.NEWUSER_IN_CONFIG.getConfigDto();
+        OldFreeUserInConfigDto oldFreeUserInConfigDto = (OldFreeUserInConfigDto) ConfigType.OLDFREEUSER_IN_CONFIG.getConfigDto();
+        OldPayUserInConfigDto oldPayUserInConfigDto = (OldPayUserInConfigDto) ConfigType.OLDPAYUSER_IN_CONFIG.getConfigDto();
+
+        Integer newUserInConfigDto_friendCount = newUserInConfigDto.getFriendCount();
+        Integer newUserInConfigDto_matchCount = newUserInConfigDto.getMatchCount();
+        Integer newUserInConfigDto_minuteDelay = newUserInConfigDto.getMinuteDelay();
+
+        Integer oldFreeUserInConfigDto_dayScope = oldFreeUserInConfigDto.getDayScope();
+        Integer oldFreeUserInConfigDto_dayActive = oldFreeUserInConfigDto.getDayActive();
+        Integer oldFreeUserInConfigDto_minuteDelay = oldFreeUserInConfigDto.getMinuteDelay();
+
+        Integer oldPayUserInConfigDto_hourScope =  oldPayUserInConfigDto.getHourScope();
+        Integer oldPayUserInConfigDto_minuteDelay =  oldPayUserInConfigDto.getMinuteDelay();
+
         Rule new_user_saver = Rule.builder().name("new_user_saver").save().behavior(task -> {
             task.setSinkerId(poolId[0]);
             return task;
         }).build();
 
-        Rule old_user_unpaid_saver = Rule.builder().name("old_user_unpaid_saver").delay(3 * 60).save().behavior(task -> {
+        Rule old_user_unpaid_saver = Rule.builder().name("old_user_unpaid_saver").delay(oldFreeUserInConfigDto_minuteDelay * 60).save().behavior(task -> {
             task.setSinkerId(poolId[1]);
             return task;
         }).build();
 
-        Rule old_user_paid_saver = Rule.builder().name("old_user_paid_saver").delay(3 * 60).save().behavior(task -> {
+        Rule old_user_paid_saver = Rule.builder().name("old_user_paid_saver").delay(oldPayUserInConfigDto_minuteDelay * 60).save().behavior(task -> {
             task.setSinkerId(poolId[2]);
             return task;
         }).build();
@@ -62,7 +73,7 @@ public class ChainRuleServer {
             return seconds < 24 * 60 * 60;
         }).build();
 
-        Rule new_user_test_pay = Rule.builder().name("new_user_test_pay").delay(3 * 60).behavior(task -> {
+        Rule new_user_test_pay = Rule.builder().name("new_user_test_pay").delay(newUserInConfigDto_minuteDelay * 60).behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
             List<Map<String, Object>> mapList = rcUserService.getPayStatusById(userInfo.getId());
             int payStatus = (Integer) mapList.stream().findAny().map(x -> x.get("payStatus")).orElse(-1);
@@ -83,7 +94,7 @@ public class ChainRuleServer {
                             .equals(userInfo.getId())
             ).findAny().ifPresent(context::putAll);
             return task;
-        }).checker(o -> (Integer) o.getContext().getOrDefault("friendCount", -1) < 1).build();
+        }).checker(o -> (int) o.getContext().getOrDefault("friendCount", -1) < newUserInConfigDto_matchCount).build();
 
         Rule new_user_test_friends = Rule.builder().name("new_user_test_friends").behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
@@ -94,26 +105,26 @@ public class ChainRuleServer {
                             .equals(userInfo.getId())
             ).findAny().ifPresent(context::putAll);
             return task;
-        }).checker(o -> (Integer) o.getContext().getOrDefault("videoCount", -1) < 1).build();
+        }).checker(o -> (int) o.getContext().getOrDefault("videoCount", -1) < newUserInConfigDto_friendCount).build();
 
 
         Rule old_user_active_days_test = Rule.builder().name("old_user_active_days_test").behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
             Map context = task.getContext();
-            List<Map<String, Object>> mapList = rcUserRecordService.getActiveDaysByIdAndTime(userInfo.getId(), DateUtil.getLastNDayStartTime(3));
+            List<Map<String, Object>> mapList = rcUserRecordService.getActiveDaysByIdAndTime(userInfo.getId(), DateUtil.getLastNDayStartTime(oldFreeUserInConfigDto_dayScope));
             mapList.stream().filter(
                     stringObjectMap -> stringObjectMap.getOrDefault("id", -1)
                             .equals(userInfo.getId())
             ).findAny().ifPresent(context::putAll);
             return task;
-        }).checker(o -> (Integer) o.getContext().getOrDefault("activeCount", -1) > 2).build();
+        }).checker(o -> (int) o.getContext().getOrDefault("activeCount", -1) > oldFreeUserInConfigDto_dayActive).build();
 
         Rule old_user_check_pay = Rule.builder().name("old_user_check_pay").checker(o -> 0 == o.getUserInfo().getPayStatus()).build();
 
         Rule old_user_paid_check_pay_by_hours = Rule.builder().name("old_user_paid_check_pay_by_hours").behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
             Map context = task.getContext();
-            List<Map<String, Object>> mapList = rcVideoChatService.checkPayStatusByHoursAndId(userInfo.getId(), DateUtil.getLastNHoursStartTime(24));
+            List<Map<String, Object>> mapList = rcVideoChatService.checkPayStatusByHoursAndId(userInfo.getId(), DateUtil.getLastNHoursStartTime(oldPayUserInConfigDto_hourScope));
             mapList.stream().filter(
                     stringObjectMap -> stringObjectMap.getOrDefault("id", -1)
                             .equals(userInfo.getId())
@@ -143,7 +154,6 @@ public class ChainRuleServer {
         log.info("RULE STRUCTURE : {}", root);
         root.gc();
     }
-
 
     @SuppressWarnings("unchecked")
     public void start(Task task) throws Exception {

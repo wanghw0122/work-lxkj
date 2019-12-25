@@ -7,6 +7,7 @@ import com.rcplatformhk.us.dao.mapper.RcQuickChatConfigMapper;
 import com.rcplatformhk.us.dao.service.RcQuickChatConfigService;
 import com.rcplatformhk.utils.SerializeUtils;
 import com.rcplatformhk.utils.SpringContextUtil;
+import com.rcplatformhk.utils.ValidationUtils;
 import lombok.Getter;
 import org.springframework.util.CollectionUtils;
 
@@ -51,6 +52,10 @@ public enum ConfigType {
             if (!optional.isPresent())
                 throw new ConfigInitException("Init Config Error! Type : " + this.msg);
             this.configDto = optional.get();
+            ValidationUtils.ValidationResult validationResult = ValidationUtils.validateEntity(configDto);
+            if (validationResult.isHasErrors()){
+                throw new ConfigInitException("config param invalid! :" + validationResult.getErrorMsg());
+            }
         } else throw new ConfigInitException("No Config Error! Type : " + this.msg);
     }
 }

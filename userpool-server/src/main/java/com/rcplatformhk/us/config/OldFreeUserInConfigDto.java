@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Builder
 @Data
-public class OldFreeUserInConfigDto implements Serializable {
+public class OldFreeUserInConfigDto extends ConfigDto implements Serializable {
 
     @NotNull(message = "dayScope can not be null")
     @Min(1)

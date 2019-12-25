@@ -1,5 +1,6 @@
 package com.rcplatformhk.us.task;
 
+import com.rcplatformhk.common.ConfigInitException;
 import com.rcplatformhk.pojo.UserInfo;
 import com.rcplatformhk.us.component.ChainRuleServer;
 import com.rcplatformhk.us.service.impl.RedisCacheQueue;
@@ -39,21 +40,28 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
         try {
             log.info("rules init start...");
             chainRuleServer.init();
-            log.info("rules init complete...");
+            log.info("rules init success...");
             for (int i = 0; i < size; i++) {
                 String cacheName = "cache_queue_pop_thread_" + i;
                 String queueName = "delay_queue_pop_thread" + i;
                 start_cache_queue_pop_thread(cacheName);
+                log.info("ExecutorStarter Thread {} start success!",cacheName);
                 start_delay_queue_pop_thread(queueName);
+                log.info("ExecutorStarter Thread {} start success!",queueName);
             }
+        } catch (ConfigInitException e) {
+            log.error("ExecutorStarter ERROR: config init error! {}", e.getMessage(), e);
+            log.error("ExecutorStarter ERROR: rules init failed!");
         } catch (Exception e) {
+            log.error("ExecutorStarter ERROR: {}", e.getMessage(), e);
+            log.error("ExecutorStarter THREAD START FAILED!");
             e.printStackTrace();
         }
     }
 
     private void start_cache_queue_pop_thread(String name) throws Exception {
         new Thread(() -> {
-            do {
+            while (true) {
                 UserInfo userInfo = redisCacheQueue.pop();
                 if (Objects.isNull(userInfo))
                     continue;
@@ -61,7 +69,7 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
                 if (!redisUserPool.checkAndPut(userId)) {
                     redisDelayQueue.put(userInfo);
                 }
-            } while (true);
+            }
         }, name).start();
     }
 
