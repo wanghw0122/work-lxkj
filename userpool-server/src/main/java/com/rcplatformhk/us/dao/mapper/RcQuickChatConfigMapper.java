@@ -14,7 +14,7 @@ import java.util.List;
 
 @Repository
 public interface RcQuickChatConfigMapper {
-    @Select("SELECT * FROM rc_quick_chat_config where type = ${type}")
+    @Select("SELECT * FROM rc_quick_chat_config where type = #{type}")
     @Results({
             @Result(property = "id",  column = "id"),
             @Result(property = "type", column = "type"),
