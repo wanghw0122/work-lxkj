@@ -1,5 +1,6 @@
 package com.rcplatformhk.flink;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.google.common.collect.Maps;
 
 import com.rcplatformhk.pojo.UserInfo;
@@ -41,7 +42,7 @@ public class FlinkServer {
         }
 
         public String getValueFromData(UserInfo data) {
-            return SerializeUtils.serialize(data).get();
+            return SerializeUtils.serialize(data, PropertyNamingStrategy.LOWER_CAMEL_CASE).get();
         }
     }
 

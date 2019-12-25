@@ -1,5 +1,6 @@
 package com.rcplatformhk.us.common;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.rcplatformhk.common.ConfigInitException;
 import com.rcplatformhk.us.config.*;
 import com.rcplatformhk.us.dao.entity.RcQuickChatConfigEntity;
@@ -18,11 +19,11 @@ import java.util.Optional;
 public enum ConfigType {
 
     NEWUSER_IN_CONFIG("newUserInConfig", "新用户入池规则", NewUserInConfigDto.class),
-    NEWUSER_OUT_CONFIG("newUserOutConfig", "新用户出池规则", NewUserOutConfigDto.class),
+//    NEWUSER_OUT_CONFIG("newUserOutConfig", "新用户出池规则", NewUserOutConfigDto.class),
     OLDFREEUSER_IN_CONFIG("oldFreeUserInConfig", "免费老用户入池规则", OldFreeUserInConfigDto.class),
-    OLDFREEUSER_OUT_CONFIG("oldFreeUserOutConfig", "免费老用户出池规则", OldFreeUserOutConfigDto.class),
-    OLDPAYUSER_IN_CONFIG("oldPayUserInConfig", "付费老用户入池规则", OldPayUserInConfigDto.class),
-    OLDPAYUSER_OUT_CONFIG("oldPayUserOutConfig", "付费老用户出池规则", OldPayUserOutConfigDto.class);
+//    OLDFREEUSER_OUT_CONFIG("oldFreeUserOutConfig", "免费老用户出池规则", OldFreeUserOutConfigDto.class),
+    OLDPAYUSER_IN_CONFIG("oldPayUserInConfig", "付费老用户入池规则", OldPayUserInConfigDto.class);
+//    OLDPAYUSER_OUT_CONFIG("oldPayUserOutConfig", "付费老用户出池规则", OldPayUserOutConfigDto.class);
 
     private String type;
     private String msg;
@@ -48,7 +49,7 @@ public enum ConfigType {
         if (!CollectionUtils.isEmpty(rcQuickChatConfigEntities)) {
             RcQuickChatConfigEntity rcQuickChatConfigEntity = rcQuickChatConfigEntities.get(0);
             String configText = rcQuickChatConfigEntity.getConfigText();
-            Optional<ConfigDto> optional = SerializeUtils.deserialize(configText, this.clazz);
+            Optional<ConfigDto> optional = SerializeUtils.deserialize(configText, this.clazz, PropertyNamingStrategy.LOWER_CAMEL_CASE);
             if (!optional.isPresent())
                 throw new ConfigInitException("Init Config Error! Type : " + this.msg);
             this.configDto = optional.get();

@@ -101,4 +101,8 @@ public class SerializeUtils {
     public static <T> Optional<List<T>> deserializeList(String json, Class<T> t) {
         return deserializeList(json, t, DEFAULT_STRATEGY);
     }
+
+    public static void main(String[] args) {
+
+    }
 }
