@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@DbType(type = 1)
+@DbType
 public class RcQuickChatConfigService {
     @Autowired
     private RcQuickChatConfigMapper rcQuickChatConfigMapper;

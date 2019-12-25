@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@DbType(type = 1)
+@DbType(type = 2)
 public class RcUserRecordService {
 
     @Autowired

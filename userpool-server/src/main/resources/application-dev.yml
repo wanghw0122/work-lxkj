@@ -22,10 +22,10 @@ spring:
 datasource:
   jdbc:
     driverClassName: com.mysql.jdbc.Driver
-    url_major: jdbc:mysql://127.0.0.1:3306/test
+    url_major: jdbc:mysql://127.0.0.1:3306/test?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username_major: root
     password_major: 123456
-    url_secondary: jdbc:mysql://39.100.73.91:3306/test
+    url_secondary: jdbc:mysql://39.100.73.91:3306/rc_video_chat?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username_secondary: root
     password_secondary: rc_2019_good
 thread:
