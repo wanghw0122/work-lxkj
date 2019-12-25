@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Repository
 public interface RcVideoChatMapper {
-    @Select("select user_id,count(1) count from rc_video_chat.rc_consume_record where user_id in (#{id}) and create_time > #{time} and money > 0")
+    @Select("select user_id,count(1) count from rc_consume_record where user_id in (#{id}) and create_time > #{time} and money > 0")
     @Results({
             @Result(property = "id",  column = "user_id"),
             @Result(property = "payCount", column = "count"),

@@ -2,6 +2,7 @@ package com.rcplatformhk.us.component;
 
 import com.rcplatformhk.pojo.UserInfo;
 import com.rcplatformhk.us.dao.mapper.*;
+import com.rcplatformhk.us.dao.service.*;
 import com.rcplatformhk.us.rule.Rule;
 import com.rcplatformhk.us.task.Task;
 import com.rcplatformhk.utils.DateUtil;
@@ -16,16 +17,17 @@ import java.util.Map;
 @Slf4j
 public class ChainRuleServer {
 
+
     @Resource
-    private RcUserMapper rcUserMapper;
+    private RcUserService rcUserService;
     @Resource
-    private RcVideoRecordOddMapper rcVideoRecordOddMapper;
+    private RcVideoRecordOddService rcVideoRecordOddService;
     @Resource
-    private RcVideoFriendMapper rcVideoFriendMapper;
+    private RcVideoFriendService rcVideoFriendService;
     @Resource
-    private RcUserRecordMapper rcUserRecordMapper;
+    private RcUserRecordService rcUserRecordService;
     @Resource
-    private RcVideoChatMapper rcVideoChatMapper;
+    private RcVideoChatService rcVideoChatService;
 
     private static Rule root = Rule.root();
 
@@ -62,7 +64,7 @@ public class ChainRuleServer {
 
         Rule new_user_test_pay = Rule.builder().name("new_user_test_pay").delay(3 * 60).behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
-            List<Map<String, Object>> mapList = rcUserMapper.getPayStatusById(userInfo.getId());
+            List<Map<String, Object>> mapList = rcUserService.getPayStatusById(userInfo.getId());
             int payStatus = (Integer) mapList.stream().findAny().map(x -> x.get("payStatus")).orElse(-1);
             if (payStatus < 0) payStatus = userInfo.getPayStatus();
             userInfo.setPayStatus(payStatus);
@@ -75,7 +77,7 @@ public class ChainRuleServer {
         Rule new_user_test_match_count = Rule.builder().name("new_user_test_match_count").behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
             Map context = task.getContext();
-            List<Map<String, Object>> mapList = rcVideoRecordOddMapper.getLiveChatStatisticsByUserIdAndRequestType(0, userInfo.getId());
+            List<Map<String, Object>> mapList = rcVideoRecordOddService.getLiveChatStatisticsByUserIdAndRequestType(0, userInfo.getId());
             mapList.stream().filter(
                     stringObjectMap -> stringObjectMap.getOrDefault("id", -1)
                             .equals(userInfo.getId())
@@ -86,7 +88,7 @@ public class ChainRuleServer {
         Rule new_user_test_friends = Rule.builder().name("new_user_test_friends").behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
             Map context = task.getContext();
-            List<Map<String, Object>> mapList = rcVideoFriendMapper.getFriendsCountByUserId(userInfo.getId());
+            List<Map<String, Object>> mapList = rcVideoFriendService.getFriendsCountByUserId(userInfo.getId());
             mapList.stream().filter(
                     stringObjectMap -> stringObjectMap.getOrDefault("id", -1)
                             .equals(userInfo.getId())
@@ -98,7 +100,7 @@ public class ChainRuleServer {
         Rule old_user_active_days_test = Rule.builder().name("old_user_active_days_test").behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
             Map context = task.getContext();
-            List<Map<String, Object>> mapList = rcUserRecordMapper.getActiveDaysByIdAndTime(userInfo.getId(), DateUtil.getLastNDayStartTime(3));
+            List<Map<String, Object>> mapList = rcUserRecordService.getActiveDaysByIdAndTime(userInfo.getId(), DateUtil.getLastNDayStartTime(3));
             mapList.stream().filter(
                     stringObjectMap -> stringObjectMap.getOrDefault("id", -1)
                             .equals(userInfo.getId())
@@ -111,7 +113,7 @@ public class ChainRuleServer {
         Rule old_user_paid_check_pay_by_hours = Rule.builder().name("old_user_paid_check_pay_by_hours").behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
             Map context = task.getContext();
-            List<Map<String, Object>> mapList = rcVideoChatMapper.checkPayStatusByHoursAndId(userInfo.getId(), DateUtil.getLastNHoursStartTime(24));
+            List<Map<String, Object>> mapList = rcVideoChatService.checkPayStatusByHoursAndId(userInfo.getId(), DateUtil.getLastNHoursStartTime(24));
             mapList.stream().filter(
                     stringObjectMap -> stringObjectMap.getOrDefault("id", -1)
                             .equals(userInfo.getId())

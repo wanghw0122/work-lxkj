@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Repository
 public interface RcUserRecordMapper {
-    @Select("select user_id,count(distinct(date_format(create_time,'%y%m%d'))) count from rc_live_chat_statistics.rc_user_record where user_id in (#{id}) and create_time > #{createTime}")
+    @Select("select user_id,count(distinct(date_format(create_time,'%y%m%d'))) count from rc_user_record where user_id in (#{id}) and create_time > #{createTime}")
     @Results({
             @Result(property = "id",  column = "user_id"),
             @Result(property = "activeCount", column = "count"),

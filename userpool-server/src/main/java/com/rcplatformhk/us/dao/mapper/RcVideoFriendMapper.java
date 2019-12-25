@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Repository
 public interface RcVideoFriendMapper {
-    @Select("SELECT user_id,count(1) count FROM rc_video_chat.rc_user_friend where user_id in (#{id}) group by user_id")
+    @Select("SELECT user_id,count(1) count FROM rc_user_friend where user_id in (#{id}) group by user_id")
     @Results({
             @Result(property = "id",  column = "user_id"),
             @Result(property = "friendCount", column = "count"),

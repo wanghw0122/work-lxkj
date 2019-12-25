@@ -3,6 +3,7 @@ package com.rcplatformhk.us.sink;
 import com.rcplatformhk.common.MapToObjectException;
 import com.rcplatformhk.pojo.QuickChatUserInfo;
 import com.rcplatformhk.us.dao.mapper.RcQuickChatUserPoolMapper;
+import com.rcplatformhk.us.dao.service.RcQuickChatUserPoolService;
 import com.rcplatformhk.us.task.Task;
 import com.rcplatformhk.utils.Map2ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +17,14 @@ import java.util.Map;
 public class MysqlSink implements Sink<Task> {
 
     @Autowired
-    private RcQuickChatUserPoolMapper rcQuickChatUserPoolMapper;
+    private RcQuickChatUserPoolService rcQuickChatUserPoolService;
 
     @Override
     public void sink(Task task) {
         QuickChatUserInfo userInfo = null;
         try {
             userInfo = getUserInfoFromTask(task);
-            int l = rcQuickChatUserPoolMapper.insertQuickChatUserInfo(userInfo);
+            int l = rcQuickChatUserPoolService.insertQuickChatUserInfo(userInfo);
             if (l <= 0)
                 log.error("Save to Mysql Error!");
         } catch (MapToObjectException e) {

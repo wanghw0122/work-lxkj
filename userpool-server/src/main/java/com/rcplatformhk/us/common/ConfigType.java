@@ -4,6 +4,7 @@ import com.rcplatformhk.common.ConfigInitException;
 import com.rcplatformhk.us.config.*;
 import com.rcplatformhk.us.dao.entity.RcQuickChatConfigEntity;
 import com.rcplatformhk.us.dao.mapper.RcQuickChatConfigMapper;
+import com.rcplatformhk.us.dao.service.RcQuickChatConfigService;
 import com.rcplatformhk.utils.SerializeUtils;
 import com.rcplatformhk.utils.SpringContextUtil;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public enum ConfigType {
     private String msg;
     private Class clazz;
     private ConfigDto configDto;
-    private static RcQuickChatConfigMapper rcQuickChatConfigMapper;
+    private static RcQuickChatConfigService rcQuickChatConfigService;
 
     ConfigType(String type, String msg, Class clazz) {
         this.type = type;
@@ -35,14 +36,14 @@ public enum ConfigType {
     }
 
     public static void init() throws Exception {
-        rcQuickChatConfigMapper = SpringContextUtil.getBean(RcQuickChatConfigMapper.class);
+        rcQuickChatConfigService = SpringContextUtil.getBean(RcQuickChatConfigService.class);
         for (ConfigType configType : ConfigType.values()) {
-            configType.initialize(rcQuickChatConfigMapper);
+            configType.initialize(rcQuickChatConfigService);
         }
     }
 
-    public void initialize(RcQuickChatConfigMapper rcQuickChatConfigMapper) throws Exception {
-        List<RcQuickChatConfigEntity> rcQuickChatConfigEntities = rcQuickChatConfigMapper.getConfigByType(this.type);
+    public void initialize(RcQuickChatConfigService rcQuickChatConfigService) throws Exception {
+        List<RcQuickChatConfigEntity> rcQuickChatConfigEntities = rcQuickChatConfigService.getConfigByType(this.type);
         if (!CollectionUtils.isEmpty(rcQuickChatConfigEntities)) {
             RcQuickChatConfigEntity rcQuickChatConfigEntity = rcQuickChatConfigEntities.get(0);
             String configText = rcQuickChatConfigEntity.getConfigText();

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-@Service
-@DbType(type = 1)
+//@Service
+//@DbType(type = 1)
 public class TeacherService {
 
     @Autowired

@@ -2,7 +2,6 @@ package com.rcplatformhk.us.dao.service;
 
 import com.rcplatformhk.us.annotation.DbType;
 import com.rcplatformhk.us.dao.mapper.RcVideoRecordOddMapper;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
