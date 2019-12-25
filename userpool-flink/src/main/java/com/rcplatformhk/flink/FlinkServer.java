@@ -87,7 +87,7 @@ public class FlinkServer {
             FlinkJedisClusterConfig conf = new FlinkJedisClusterConfig.Builder().setNodes(loadClusters())
                     .build();
             map.addSink(new RedisSink<>(conf, new RedisExampleMapper()));
-            env.execute("Flink_binlog_to_redis");
+            env.execute();
         } catch (Exception e) {
             logger.error("FlinkServer Exception{}", e.getMessage(), e);
         }
