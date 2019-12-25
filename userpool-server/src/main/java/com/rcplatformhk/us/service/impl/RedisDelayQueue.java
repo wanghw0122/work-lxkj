@@ -1,5 +1,6 @@
 package com.rcplatformhk.us.service.impl;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.rcplatformhk.pojo.UserInfo;
 import com.rcplatformhk.us.service.Queue;
@@ -42,14 +43,13 @@ public class RedisDelayQueue implements Queue, Serializable {
         int l = n - 1;
         List list;
         try {
-            list = (List) new SessionCallback() {
+            list = new SessionCallback() {
                 @Override
-                public Object execute(RedisOperations redisOperations) throws DataAccessException {
-                    redisOperations.multi();
-                    boundZSetOperations.size();
-                    boundZSetOperations.rangeWithScores(0, l);
-                    boundZSetOperations.removeRange(0, l);
-                    return redisOperations.exec();
+                public List<Object> execute(RedisOperations redisOperations) throws DataAccessException {
+                    return Lists.newArrayList(
+                            boundZSetOperations.size(),
+                            boundZSetOperations.rangeWithScores(0, l),
+                            boundZSetOperations.removeRange(0, l));
                 }
             }.execute(redisTemplate);
             long p = (long) list.get(0);

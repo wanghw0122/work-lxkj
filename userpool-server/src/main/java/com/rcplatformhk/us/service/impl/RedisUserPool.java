@@ -1,5 +1,6 @@
 package com.rcplatformhk.us.service.impl;
 
+import com.google.common.collect.Lists;
 import com.rcplatformhk.us.service.UserPool;
 import com.rcplatformhk.utils.DateUtil;
 import io.netty.util.internal.StringUtil;
@@ -67,11 +68,10 @@ public class RedisUserPool implements UserPool, Serializable {
             List list = redisTemplate.execute(new SessionCallback<List<Object>>() {
                 @Override
                 public List<Object> execute(RedisOperations operations) throws DataAccessException {
-
-                    operations.multi();
-                    boundSetOperations.isMember(object);
-                    boundSetOperations.add(object);
-                    return operations.exec();
+                    return Lists.newArrayList(
+                    boundSetOperations.isMember(object),
+                    boundSetOperations.add(object)
+                    );
                 }
             });
             assert list != null;
