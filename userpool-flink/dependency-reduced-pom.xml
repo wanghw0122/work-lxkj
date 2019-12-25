@@ -24,7 +24,7 @@
               <resource>reference.conf</resource>
             </transformer>
             <transformer>
-              <mainClass />
+              <mainClass>com.rcplatformhk.flink.FlinkServer</mainClass>
             </transformer>
           </transformers>
         </configuration>

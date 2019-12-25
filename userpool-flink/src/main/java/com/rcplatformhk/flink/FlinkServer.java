@@ -64,6 +64,7 @@ public class FlinkServer {
 
     public static void main(String[] args) {
         try {
+
             final ParameterTool params = ParameterTool.fromArgs(args);
             // set up the execution environment
             final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -84,10 +85,12 @@ public class FlinkServer {
                     .map((MapFunction<Protobuf3.DuckulaEvent, UserInfo>)
                             e -> Map2ObjectUtil.mapToObject(Maps.newHashMap(e.getAfterMap()), UserInfo.class))
                     .filter((FilterFunction<UserInfo>) value -> value.getGender() == 1);
+//            FlinkJedisPoolConfig conf = new FlinkJedisPoolConfig.Builder().setHost("172.26.220.197").setPort(6379).build();
+
             FlinkJedisClusterConfig conf = new FlinkJedisClusterConfig.Builder().setNodes(loadClusters())
                     .build();
             map.addSink(new RedisSink<>(conf, new RedisExampleMapper()));
-            env.execute();
+            env.execute("Flink_binlog_to_redis");
         } catch (Exception e) {
             logger.error("FlinkServer Exception{}", e.getMessage(), e);
         }
@@ -96,7 +99,7 @@ public class FlinkServer {
     public static Set<InetSocketAddress> loadClusters() {
         Set<InetSocketAddress> inetSocketAddresses;
         Properties properties = new Properties();
-        InputStream inputStream = Object.class.getResourceAsStream("/cluster.properties");
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("cluster.properties");
         try {
             properties.load(inputStream);
         } catch (IOException e) {
