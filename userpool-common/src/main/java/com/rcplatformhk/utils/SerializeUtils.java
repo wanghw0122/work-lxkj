@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import static com.fasterxml.jackson.databind.PropertyNamingStrategy.*;
 public class SerializeUtils {
 
     private static final PropertyNamingStrategy DEFAULT_STRATEGY = SNAKE_CASE;
-
+    private static final Logger logger = LoggerFactory.getLogger(SerializeUtils.class);
     private static final Map<PropertyNamingStrategy, ObjectMapper> MAPPER_MAP;
 
     static {
@@ -59,7 +61,7 @@ public class SerializeUtils {
         try {
             return Optional.of(mapper.writeValueAsString(object));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("SerializeUtils serialize Exception{}", e.getMessage(), e);
         }
         return Optional.empty();
     }
@@ -72,7 +74,7 @@ public class SerializeUtils {
         try {
             return Optional.of(mapper.readValue(json, t));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("SerializeUtils deserialize Exception{}", e.getMessage(), e);
         }
         return Optional.empty();
     }
@@ -85,7 +87,7 @@ public class SerializeUtils {
         try {
             return Optional.of(mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(List.class, t)));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("SerializeUtils deserializeList Exception{}", e.getMessage(), e);
         }
         return Optional.empty();
     }

@@ -36,10 +36,10 @@ public class RedisDelayQueue implements Queue, Serializable {
     }
 
     @Override
-    public LinkedHashMap<UserInfo,Long> pop(int n) {
+    public LinkedHashMap<UserInfo, Long> pop(int n) {
         LinkedHashMap res = Maps.newLinkedHashMap();
-        if (n <= 0 ) return res;
-        int l = n-1;
+        if (n <= 0) return res;
+        int l = n - 1;
         List list;
         try {
             list = (List) new SessionCallback() {
@@ -57,24 +57,23 @@ public class RedisDelayQueue implements Queue, Serializable {
             Set set = (Set) list.get(1);
             if (p == 0L) return null;
             else assert set != null && q >= 1L;
-            log.info(MessageFormat.format("========================>>> DELAY_QUEUE THREAD {0} POP OBJECT {1} SUCCESS! <<<========================",Thread.currentThread().getName(),set));
+            log.info(MessageFormat.format("========================>>> DELAY_QUEUE THREAD {0} POP OBJECT {1} SUCCESS! <<<========================", Thread.currentThread().getName(), set));
             set.stream().filter(Objects::nonNull).forEach(o -> {
-                ZSetOperations.TypedTuple typedTuple1 =  (ZSetOperations.TypedTuple)o;
+                ZSetOperations.TypedTuple typedTuple1 = (ZSetOperations.TypedTuple) o;
                 UserInfo userInfo = (UserInfo) typedTuple1.getValue();
-                long score =  typedTuple1.getScore().longValue();
-                res.put(userInfo,score);
+                long score = typedTuple1.getScore().longValue();
+                res.put(userInfo, score);
             });
         } catch (Exception e) {
-            log.error(MessageFormat.format("========================>>> DELAY_QUEUE THREAD {0} POP OBJECT ERROR!! MSG:{1} <<<========================",Thread.currentThread().getName(),e.getMessage(),e));
+            log.error(MessageFormat.format("========================>>> DELAY_QUEUE THREAD {0} POP OBJECT ERROR!! MSG:{1} <<<========================", Thread.currentThread().getName(), e.getMessage(), e));
         }
         return res;
     }
 
     public Optional<UserInfo> pop() throws InterruptedException {
 
-        LinkedHashMap<UserInfo,Long> map = this.pop(1);
-        while (map == null || map.size() == 0)
-        {
+        LinkedHashMap<UserInfo, Long> map = this.pop(1);
+        while (map == null || map.size() == 0) {
             TimeUnit.SECONDS.sleep(10);
             map = pop(1);
         }
@@ -90,10 +89,10 @@ public class RedisDelayQueue implements Queue, Serializable {
                     return false;
                 ZSetOperations.TypedTuple<Object> typedTuple = new DefaultTypedTuple<>(userInfo, (double) DateUtil.parseToTimeStemp(userInfo.getUpdateTime()));
                 typedTupleSet.add(typedTuple);
-                log.info(MessageFormat.format("========================>>> thread : {0} typedTupleSet.add({1}) <<<========================",Thread.currentThread().getName(),userInfo));
+                log.info(MessageFormat.format("========================>>> thread : {0} typedTupleSet.add({1}) <<<========================", Thread.currentThread().getName(), userInfo));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("RedisDelayQueue put Exception:{}", e.getMessage(), e);
             return false;
         }
         Long res = boundZSetOperations.add(typedTupleSet);

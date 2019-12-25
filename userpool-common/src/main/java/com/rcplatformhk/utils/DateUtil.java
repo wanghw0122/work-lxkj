@@ -1,5 +1,8 @@
 package com.rcplatformhk.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -12,6 +15,8 @@ public class DateUtil {
             new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static final SimpleDateFormat DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd");
+
+    private static Logger logger = LoggerFactory.getLogger(DateUtil.class);
 
     private static String TIME_PATTERN = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}";
     private static String DATE_PATTERN = "\\d{4}-\\d{2}-\\d{2}";
@@ -31,7 +36,7 @@ public class DateUtil {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("DateUtil before Error!{}",e.getMessage(),e);
         }
         return false;
     }
@@ -41,7 +46,7 @@ public class DateUtil {
         try {
             return TIME_FORMAT.parse(pattern);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.error("DateUtil parseToDate Error!{}",e.getMessage(),e);
         }
         return null;
     }
@@ -67,7 +72,7 @@ public class DateUtil {
                 return true;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("DateUtil after Error!{}",e.getMessage(),e);
         }
         return false;
     }
@@ -87,7 +92,7 @@ public class DateUtil {
 
             return (int) (millisecond/1000);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("DateUtil minus Error!{}",e.getMessage(),e);
         }
         return -1;
     }

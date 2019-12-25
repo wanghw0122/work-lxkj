@@ -3,6 +3,7 @@ package com.rcplatformhk.us.service.impl;
 import com.rcplatformhk.us.service.UserPool;
 import com.rcplatformhk.utils.DateUtil;
 import io.netty.util.internal.StringUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.BoundSetOperations;
@@ -18,6 +19,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Slf4j
 public class RedisUserPool implements UserPool, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -75,7 +77,7 @@ public class RedisUserPool implements UserPool, Serializable {
             assert list != null;
             return (boolean) list.get(0);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("RedisUserPool checkAndPut Error {}", e.getMessage(), e);
         }
         return false;
     }

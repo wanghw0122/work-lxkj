@@ -114,7 +114,7 @@ public class Rule {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Rule checkList Exception{}", e.getMessage(), e);
         }
         return sets;
     }

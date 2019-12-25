@@ -45,9 +45,9 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
                 String cacheName = "cache_queue_pop_thread_" + i;
                 String queueName = "delay_queue_pop_thread" + i;
                 start_cache_queue_pop_thread(cacheName);
-                log.info("ExecutorStarter Thread {} start success!",cacheName);
+                log.info("ExecutorStarter Thread {} start success!", cacheName);
                 start_delay_queue_pop_thread(queueName);
-                log.info("ExecutorStarter Thread {} start success!",queueName);
+                log.info("ExecutorStarter Thread {} start success!", queueName);
             }
         } catch (ConfigInitException e) {
             log.error("ExecutorStarter ERROR: config init error! {}", e.getMessage(), e);
@@ -55,7 +55,6 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
         } catch (Exception e) {
             log.error("ExecutorStarter ERROR: {}", e.getMessage(), e);
             log.error("ExecutorStarter THREAD START FAILED!");
-            e.printStackTrace();
         }
     }
 
@@ -80,7 +79,7 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
                     Optional<UserInfo> userInfo = redisDelayQueue.pop();
                     userInfo.ifPresent(info -> new Task(info, chainRuleServer, mysqlSink).flow());
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("PopThread:{} Msg:{}", Thread.currentThread().getName(), e.getMessage(), e);
                 }
             }
         }, name).start();

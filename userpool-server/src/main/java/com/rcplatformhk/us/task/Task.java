@@ -4,10 +4,8 @@ import com.google.common.collect.Maps;
 import com.rcplatformhk.pojo.UserInfo;
 import com.rcplatformhk.us.component.ChainRuleServer;
 import com.rcplatformhk.us.sink.Sink;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.Objects;
@@ -16,6 +14,8 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
+@ToString
 public class Task {
     UserInfo userInfo;
     Long timeStamp;
@@ -36,7 +36,7 @@ public class Task {
         try {
             chainRuleServer.start(this);
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("Flow Task {} Exception {}",this,e.getMessage(),e);
         }
     }
 

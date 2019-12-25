@@ -46,7 +46,7 @@ public class Map2ObjectUtil {
             }
             return obj;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Map2ObjectUtil Exception{} ",e.getMessage(),e);
         }
         return null;
     }
