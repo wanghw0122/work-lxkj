@@ -3,8 +3,6 @@ package com.rcplatformhk.flink;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.google.common.collect.Maps;
 
-import com.google.common.collect.Sets;
-import com.mysql.jdbc.StringUtils;
 import com.rcplatformhk.pojo.UserInfo;
 import com.rcplatformhk.utils.Map2ObjectUtil;
 import com.rcplatformhk.utils.SerializeUtils;
@@ -27,7 +25,6 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.redis.RedisSink;
 import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisClusterConfig;
-import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisPoolConfig;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommand;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisCommandDescription;
 import org.apache.flink.streaming.connectors.redis.common.mapper.RedisMapper;
