@@ -69,17 +69,17 @@ public class Map2ObjectUtil {
     private static <T> T cast2Object(Class<T> clazz, Object object) throws Exception {
         if (Objects.isNull(object))
             return null;
-        object = String.valueOf(object);
+        String object_str = String.valueOf(object);
         if (String.class.equals(clazz))
-            return (T) String.valueOf(object);
+            return (T) String.valueOf(object_str);
         if (Integer.class.equals(clazz))
-            return (T) Integer.valueOf((String) object);
+            return (T) Integer.valueOf(object_str);
         if (Boolean.class.equals(clazz))
-            return (T) Boolean.valueOf((String) object);
+            return (T) Boolean.valueOf(object_str);
         if (Float.class.equals(clazz))
-            return (T) Float.valueOf((String) object);
+            return (T) Float.valueOf(object_str);
         if (Long.class.equals(clazz))
-            return (T) Long.valueOf((String) object);
+            return (T) Long.valueOf(object_str);
         else
             throw new RuntimeException("Class Not Found!  Class: " + clazz.getName());
     }

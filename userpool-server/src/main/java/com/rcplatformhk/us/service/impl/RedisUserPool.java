@@ -75,6 +75,7 @@ public class RedisUserPool implements UserPool, Serializable {
                 }
             });
             assert list != null;
+            log.info("checkAndPut userId {} result {}", object,list.get(0));
             return (boolean) list.get(0);
         } catch (Exception e) {
             log.error("RedisUserPool checkAndPut Error {}", e.getMessage(), e);
