@@ -4,6 +4,7 @@ import com.rcplatformhk.constant.AppIdConstant;
 import com.rcplatformhk.pojo.UserInfo;
 import com.rcplatformhk.us.dao.entity.UserLevelEntity;
 import com.rcplatformhk.us.dao.service.RcUserLevelService;
+import io.netty.util.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ public class ViplevelService {
     public Integer getUserLevelId(UserInfo userInfo) {
         String key = packageKey(USER_PAY_RECORD, userInfo.getId());
         String value = redisTemplate.opsForValue().get(key);
+        if (StringUtil.isNullOrEmpty(value))
+            return 0;
         BigDecimal money = new BigDecimal(value);
         return this.getUserLevelIdByMoney(money, userInfo.getAppId(), userInfo.getGender(), userInfo.getPlatformType());
     }
