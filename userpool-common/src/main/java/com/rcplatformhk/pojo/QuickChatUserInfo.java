@@ -60,4 +60,6 @@ public class QuickChatUserInfo {
     private Integer status;
     @FieldType(field = "extend")
     private String extend;
+    @FieldType(field = "platformType")
+    private Integer platformType;
 }

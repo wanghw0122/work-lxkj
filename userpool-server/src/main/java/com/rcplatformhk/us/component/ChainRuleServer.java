@@ -70,7 +70,7 @@ public class ChainRuleServer {
 
         Rule new_or_old_user_test = Rule.builder().name("new_or_old_user_test").checker(o -> {
             long seconds = DateUtil.minus(o.getUpdateTime(), o.getCreateTime());
-            return seconds < 24 * 60 * 60;
+            return seconds < 86400L;
         }).build();
 
         Rule new_user_test_pay = Rule.builder().name("new_user_test_pay").delay(newUserInConfigDto_minuteDelay * 60).behavior(task -> {
@@ -94,7 +94,10 @@ public class ChainRuleServer {
                             .equals(userInfo.getId())
             ).findAny().ifPresent(context::putAll);
             return task;
-        }).checker(o -> (int) o.getContext().getOrDefault("friendCount", -1) < newUserInConfigDto_matchCount).build();
+        }).checker(o ->{
+            Number number = (Number) o.getContext().getOrDefault("friendCount",-1);
+            return number.intValue() < newUserInConfigDto_matchCount;
+        }).build();
 
         Rule new_user_test_friends = Rule.builder().name("new_user_test_friends").behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
@@ -105,7 +108,10 @@ public class ChainRuleServer {
                             .equals(userInfo.getId())
             ).findAny().ifPresent(context::putAll);
             return task;
-        }).checker(o -> (int) o.getContext().getOrDefault("videoCount", -1) < newUserInConfigDto_friendCount).build();
+        }).checker(o->{
+                    Number number = (Number) o.getContext().getOrDefault("videoCount",-1);
+                    return number.intValue() > newUserInConfigDto_friendCount;
+                }).build();
 
 
         Rule old_user_active_days_test = Rule.builder().name("old_user_active_days_test").behavior(task -> {
@@ -117,7 +123,10 @@ public class ChainRuleServer {
                             .equals(userInfo.getId())
             ).findAny().ifPresent(context::putAll);
             return task;
-        }).checker(o -> (int) o.getContext().getOrDefault("activeCount", -1) > oldFreeUserInConfigDto_dayActive).build();
+        }).checker(o -> {
+            Number number = (Number) o.getContext().getOrDefault("activeCount",-1);
+            return number.intValue() > oldFreeUserInConfigDto_dayActive;
+        }).build();
 
         Rule old_user_check_pay = Rule.builder().name("old_user_check_pay").checker(o -> 0 == o.getUserInfo().getPayStatus()).build();
 
@@ -130,7 +139,10 @@ public class ChainRuleServer {
                             .equals(userInfo.getId())
             ).findAny().ifPresent(context::putAll);
             return task;
-        }).checker(o -> (Integer) o.getContext().getOrDefault("payCount", -1) == 0).build();
+        }).checker(o ->{
+            Number number = (Number) o.getContext().getOrDefault("payCount",-1);
+            return number.intValue() == 0;
+        }).build();
 
         root.getBuilder().bindCheckRule(new_or_old_user_test);
 

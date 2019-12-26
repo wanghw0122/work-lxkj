@@ -5,7 +5,6 @@ import com.rcplatformhk.annotation.FieldType;
 import com.rcplatformhk.common.MapToObjectException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import com.rcplatformhk.pojo.UserInfo;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -46,7 +45,7 @@ public class Map2ObjectUtil {
             }
             return obj;
         } catch (Exception e) {
-            log.error("Map2ObjectUtil Exception{} ",e.getMessage(),e);
+            log.error("Map2ObjectUtil Exception{} ", e.getMessage(), e);
         }
         return null;
     }
@@ -70,25 +69,19 @@ public class Map2ObjectUtil {
     private static <T> T cast2Object(Class<T> clazz, Object object) throws Exception {
         if (Objects.isNull(object))
             return null;
-        if (object instanceof String) {
-            if (String.class.equals(clazz))
-                return (T) String.valueOf(object);
-            if (Integer.class.equals(clazz))
-                return (T) Integer.valueOf((String) object);
-            if (Boolean.class.equals(clazz))
-                return (T) Boolean.valueOf((String) object);
-            if (Float.class.equals(clazz))
-                return (T) Float.valueOf((String) object);
-            else
-                throw new RuntimeException("Class Not Found!  Class: " + clazz.getName());
-        }
-        return (T) object;
+        object = String.valueOf(object);
+        if (String.class.equals(clazz))
+            return (T) String.valueOf(object);
+        if (Integer.class.equals(clazz))
+            return (T) Integer.valueOf((String) object);
+        if (Boolean.class.equals(clazz))
+            return (T) Boolean.valueOf((String) object);
+        if (Float.class.equals(clazz))
+            return (T) Float.valueOf((String) object);
+        if (Long.class.equals(clazz))
+            return (T) Long.valueOf((String) object);
+        else
+            throw new RuntimeException("Class Not Found!  Class: " + clazz.getName());
     }
 
-
-    public static void main(String[] args) throws Exception {
-        UserInfo u = UserInfo.builder().updateTime("2018-12-12 00:00:00").build();
-
-        System.out.println(objectToMap(u));
-    }
 }

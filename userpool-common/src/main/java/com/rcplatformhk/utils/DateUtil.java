@@ -83,21 +83,21 @@ public class DateUtil {
      * @param time2 时间2
      * @return 差值
      */
-    public static int minus(String time1, String time2) {
+    public static long minus(String time1, String time2) {
         try {
             Date datetime1 = TIME_FORMAT.parse(time1);
             Date datetime2 = TIME_FORMAT.parse(time2);
 
             long millisecond = datetime1.getTime() - datetime2.getTime();
 
-            return (int) (millisecond/1000);
+            return millisecond;
         } catch (Exception e) {
             logger.error("DateUtil minus Error!{}",e.getMessage(),e);
         }
         return -1;
     }
 
-    public static int minus(String time1){
+    public static long minus(String time1){
         return minus(formatTime(new Date()),time1);
     }
 
