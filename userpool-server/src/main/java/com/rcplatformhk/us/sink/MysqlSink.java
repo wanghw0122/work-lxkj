@@ -43,6 +43,8 @@ public class MysqlSink implements Sink<Task> {
                 .forEach(stringObjectEntry -> {
                     contextMap.put(stringObjectEntry.getKey(), stringObjectEntry.getValue());
                 });
+        contextMap.remove("createTime");
+        contextMap.remove("activeTime");
         return Map2ObjectUtil.mapToObject(contextMap, QuickChatUserInfo.class);
     }
 }

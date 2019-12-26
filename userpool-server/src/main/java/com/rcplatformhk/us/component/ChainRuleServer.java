@@ -5,6 +5,7 @@ import com.rcplatformhk.us.common.ConfigType;
 import com.rcplatformhk.us.config.*;
 import com.rcplatformhk.us.dao.service.*;
 import com.rcplatformhk.us.rule.Rule;
+import com.rcplatformhk.us.service.ViplevelService;
 import com.rcplatformhk.us.task.Task;
 import com.rcplatformhk.utils.DateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,8 @@ public class ChainRuleServer {
     private RcUserRecordService rcUserRecordService;
     @Resource
     private RcVideoChatService rcVideoChatService;
+    @Resource
+    private ViplevelService viplevelService;
 
     private static Rule root = Rule.root();
 
@@ -65,6 +68,7 @@ public class ChainRuleServer {
 
         Rule old_user_paid_saver = Rule.builder().name("old_user_paid_saver").delay(oldPayUserInConfigDto_minuteDelay * 60).save().behavior(task -> {
             task.setSinkerId(poolId[2]);
+            task.getContext().put("vipLevel",viplevelService.getUserLevelId(task.getUserInfo()));
             return task;
         }).build();
 

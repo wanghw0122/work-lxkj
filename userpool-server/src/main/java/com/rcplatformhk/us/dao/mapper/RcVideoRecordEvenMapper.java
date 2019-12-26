@@ -10,22 +10,18 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public interface RcVideoRecordOddMapper {
-
-    @Select("SELECT user_id,count(1) count FROM rc_video_record_odd where request_type=#{requestType} and user_id in (#{id}) group by user_id")
+public interface RcVideoRecordEvenMapper {
+    @Select("SELECT user_id,count(1) count FROM rc_video_record_even where request_type=#{requestType} and user_id in (#{id}) group by user_id")
     @Results({
             @Result(property = "id",  column = "user_id"),
             @Result(property = "videoCount", column = "count"),
     })
     List<Map<String,Object>> getLiveChatStatisticsByUserIdAndRequestType(@Param("requestType") Integer requestType, @Param("id") Integer id);
 
-    @Select("SELECT user_id,count(1) count FROM rc_live_chat_statistics.rc_video_record_odd where user_id in (#{id}) group by user_id")
+    @Select("SELECT user_id,count(1) count FROM rc_video_record_even where user_id in (#{id}) group by user_id")
     @Results({
             @Result(property = "id",  column = "user_id"),
             @Result(property = "videoCount", column = "count"),
     })
     List<Map<String,Object>> getLiveChatStatisticsByUserId(@Param("id") Integer id);
-
-
-
 }

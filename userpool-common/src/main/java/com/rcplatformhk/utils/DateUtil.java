@@ -161,6 +161,11 @@ public class DateUtil {
     }
 
 
+    public static Boolean ifOddDayToday() {
+        int i = Calendar.getInstance().get(Calendar.DATE);
+        return i % 2 != 0;
+    }
+
     public static String getLastNHoursStartTime(int n){
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, - n);
