@@ -24,6 +24,7 @@ public class QuickChatUserInfo {
     @Default("0")
     private Integer channel;//不确定字段
     @FieldType(field = "vipLevel")
+    @Default("0")
     private Integer vipLevel;// a,b,c
     @FieldType(field = "gender")
     @NotNull

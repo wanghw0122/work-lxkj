@@ -16,37 +16,43 @@ import java.util.Objects;
 @AllArgsConstructor
 @Slf4j
 @ToString
-public class Task {
+public class Task implements Runnable {
     UserInfo userInfo;
     Long timeStamp;
     String createTime;
     String updateTime;
-    Map<String,Object> context;
+    Map<String, Object> context;
     ChainRuleServer chainRuleServer;
     Sink sinker;
-    Integer sinkerId;
-    public void sink(){
-        if (Objects.isNull(sinker)){
-            //Todo log not sinker
+    Integer poolId;
+
+    public void sink() {
+        if (Objects.isNull(sinker)) {
             return;
         }
         sinker.sink(this);
     }
-    public void flow(){
-        try {
-            chainRuleServer.start(this);
-        }catch (Exception e){
-            log.error("Flow Task {} Exception {}",this,e.getMessage(),e);
-        }
+
+    private void flow() throws Exception {
+        chainRuleServer.start(this);
     }
 
-    public Task(UserInfo userInfo, ChainRuleServer chainRuleServer, Sink sink){
+    public Task(UserInfo userInfo, ChainRuleServer chainRuleServer, Sink sink) {
         this.userInfo = userInfo;
         this.createTime = userInfo.getCreateTime();
         this.updateTime = userInfo.getUpdateTime();
         this.context = Maps.newHashMap();
         this.chainRuleServer = chainRuleServer;
         this.sinker = sink;
-        this.sinkerId = null;
+        this.poolId = null;
+    }
+
+    @Override
+    public void run() {
+        try {
+            this.flow();
+        } catch (Exception e) {
+            log.error("Flow Task {} Exception {}", this, e.getMessage(), e);
+        }
     }
 }

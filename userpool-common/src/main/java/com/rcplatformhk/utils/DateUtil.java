@@ -42,7 +42,7 @@ public class DateUtil {
     }
 
 
-    public static Date parseToDate(String pattern){
+    public static synchronized Date parseToDate(String pattern){
         try {
             return TIME_FORMAT.parse(pattern);
         } catch (ParseException e) {
@@ -83,7 +83,7 @@ public class DateUtil {
      * @param time2 时间2
      * @return 差值
      */
-    public static long minus(String time1, String time2) {
+    public static synchronized long minus(String time1, String time2) {
         try {
             Date datetime1 = TIME_FORMAT.parse(time1);
             Date datetime2 = TIME_FORMAT.parse(time2);
@@ -145,7 +145,7 @@ public class DateUtil {
     }
 
 
-    public static String getLastNDayStartTime(int n){
+    public static synchronized String getLastNDayStartTime(int n){
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, - n + 1);
        return DATE_FORMAT.format(calendar.getTime()).concat(" 00:00:00");
@@ -166,7 +166,7 @@ public class DateUtil {
         return i % 2 != 0;
     }
 
-    public static String getLastNHoursStartTime(int n){
+    public synchronized static String getLastNHoursStartTime(int n){
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR, - n);
         return TIME_FORMAT.format(calendar.getTime());

@@ -93,6 +93,7 @@ public class Rule {
                 "}";
     }
 
+
     private Set<Rule> checkList(Task task) {
         Set<Rule> sets = Sets.newHashSet();
         if (exportTables == null) return sets;
@@ -100,8 +101,14 @@ public class Rule {
             if (type == RuleType.SYN) {
                 sets = exportTables.entrySet().stream()
                         .filter(entry -> Objects.nonNull(entry.getKey()))
-                        .map(checkerEntry -> checkerEntry.getKey().check(task) ? checkerEntry.getValue()[0]
-                                : checkerEntry.getValue()[1])
+                        .map(checkerEntry -> {
+                            try {
+                                return checkerEntry.getKey().check(task) ? checkerEntry.getValue()[0]
+                                        : checkerEntry.getValue()[1];
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
                         .filter(collection -> !CollectionUtils.isEmpty(collection))
                         .flatMap(Collection::stream)
                         .collect(Collectors.toSet());

@@ -1,5 +1,5 @@
 package com.rcplatformhk.us.service;
 
 public interface Queue {
-    Object pop(int n);
+    Object pop(int n) throws Exception;
 }

@@ -57,17 +57,17 @@ public class ChainRuleServer {
         Integer oldPayUserInConfigDto_minuteDelay =  oldPayUserInConfigDto.getMinuteDelay();
 
         Rule new_user_saver = Rule.builder().name("new_user_saver").save().behavior(task -> {
-            task.setSinkerId(poolId[0]);
+            task.setPoolId(poolId[0]);
             return task;
         }).build();
 
         Rule old_user_unpaid_saver = Rule.builder().name("old_user_unpaid_saver").delay(oldFreeUserInConfigDto_minuteDelay * 60).save().behavior(task -> {
-            task.setSinkerId(poolId[1]);
+            task.setPoolId(poolId[1]);
             return task;
         }).build();
 
         Rule old_user_paid_saver = Rule.builder().name("old_user_paid_saver").delay(oldPayUserInConfigDto_minuteDelay * 60).save().behavior(task -> {
-            task.setSinkerId(poolId[2]);
+            task.setPoolId(poolId[2]);
             task.getContext().put("vipLevel",viplevelService.getUserLevelId(task.getUserInfo()));
             return task;
         }).build();

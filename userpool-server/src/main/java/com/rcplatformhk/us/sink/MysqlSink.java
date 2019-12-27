@@ -45,6 +45,7 @@ public class MysqlSink implements Sink<Task> {
                 });
         contextMap.remove("createTime");
         contextMap.remove("activeTime");
+        contextMap.put("poolId",task.getPoolId());
         return Map2ObjectUtil.mapToObject(contextMap, QuickChatUserInfo.class);
     }
 }

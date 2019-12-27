@@ -44,12 +44,12 @@ public class RedisCacheQueue implements Queue {
                     Thread.yield();
                     continue;
                 }
-                log.info(MessageFormat.format("========================>>> CACHE_QUEUE THREAD {0} POP OBJECT {1} SUCCESS! <<<========================", Thread.currentThread().getName(), o));
+                log.info(MessageFormat.format("CACHE_QUEUE THREAD {0} POP OBJECT {1} SUCCESS!", Thread.currentThread().getName(), o));
                 Optional<UserInfo> optionalUserInfo = SerializeUtils.deserialize(o, UserInfo.class, PropertyNamingStrategy.LOWER_CAMEL_CASE);
                 list.add(optionalUserInfo);
                 ++i;
             } catch (Exception e) {
-                log.error(MessageFormat.format("========================>>> CACHE_QUEUE THREAD {0} POP OBJECT ERROR!! MSG:{1} <<<========================", Thread.currentThread().getName(), e.getMessage(), e));
+                log.error(MessageFormat.format("CACHE_QUEUE THREAD {0} POP OBJECT ERROR!! MSG:{1}", Thread.currentThread().getName(), e.getMessage(), e));
             }
         }
         return list;

@@ -14,8 +14,10 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.*;
 
 @Component
 @Slf4j
@@ -35,6 +37,23 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
     @Value("${thread.size}")
     private int size;
 
+
+
+    @PostConstruct
+    private void init() {
+        ExecutorService executorService = new ThreadPoolExecutor(size, size * 2,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>());
+        new Thread(() -> {
+            while (true) {
+                Optional<UserInfo> userInfo = redisDelayQueue.pop();
+                userInfo.ifPresent(info -> executorService.submit(new Task(info, chainRuleServer, mysqlSink)));
+            }
+        }, "Delay_Queue_Thread")
+                .start();
+
+    }
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         try {
@@ -43,11 +62,8 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
             log.info("rules init success...");
             for (int i = 0; i < size; i++) {
                 String cacheName = "cache_queue_pop_thread_" + i;
-                String queueName = "delay_queue_pop_thread" + i;
                 start_cache_queue_pop_thread(cacheName);
                 log.info("ExecutorStarter Thread {} start success!", cacheName);
-                start_delay_queue_pop_thread(queueName);
-                log.info("ExecutorStarter Thread {} start success!", queueName);
             }
         } catch (ConfigInitException e) {
             log.error("ExecutorStarter ERROR: config init error! {}", e.getMessage(), e);
@@ -72,16 +88,4 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
         }, name).start();
     }
 
-    private void start_delay_queue_pop_thread(String name) throws Exception {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Optional<UserInfo> userInfo = redisDelayQueue.pop();
-                    userInfo.ifPresent(info -> new Task(info, chainRuleServer, mysqlSink).flow());
-                } catch (Exception e) {
-                    log.error("PopThread:{} Msg:{}", Thread.currentThread().getName(), e.getMessage(), e);
-                }
-            }
-        }, name).start();
-    }
 }
