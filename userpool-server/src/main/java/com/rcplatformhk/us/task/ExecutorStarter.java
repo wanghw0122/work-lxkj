@@ -37,8 +37,6 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
     @Value("${thread.size}")
     private int size;
 
-
-
     @PostConstruct
     private void init() {
         ExecutorService executorService = new ThreadPoolExecutor(size, size * 2,
@@ -63,8 +61,8 @@ public class ExecutorStarter implements ApplicationListener<ContextRefreshedEven
             for (int i = 0; i < size; i++) {
                 String cacheName = "cache_queue_pop_thread_" + i;
                 start_cache_queue_pop_thread(cacheName);
-                log.info("ExecutorStarter Thread {} start success!", cacheName);
             }
+            log.info("ExecutorStarter Thread start success!");
         } catch (ConfigInitException e) {
             log.error("ExecutorStarter ERROR: config init error! {}", e.getMessage(), e);
             log.error("ExecutorStarter ERROR: rules init failed!");

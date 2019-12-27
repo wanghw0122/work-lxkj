@@ -6,7 +6,6 @@ import io.lettuce.core.cluster.api.async.RedisAdvancedClusterAsyncCommands;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
@@ -15,6 +14,7 @@ import java.util.UUID;
 
 @Component
 @Slf4j
+@SuppressWarnings("unchecked")
 public class RedisLock {
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -89,7 +89,7 @@ public class RedisLock {
         //重试次数
         Integer retryTimes = 3;
         //先拿到当前锁对应的值（理解为版本号）
-        String value =(String)redisTemplate.opsForValue().get(keyLock);
+        String value = redisTemplate.opsForValue().get(keyLock);
         Boolean flag = false;
         //如果相等 锁应该未被释放  不相等则锁已过期自动释放此时如果有锁应为其他进程的锁
         if (lockValue.get().equals(value)) {

@@ -57,9 +57,9 @@ public class RedisDelayQueue implements Queue, Serializable {
                     return null;
                 }
             });
+            log.info("DELAY_QUEUE THREAD {} POP OBJECT {} {} {} ", Thread.currentThread().getName(), list.get(0), list.get(1), list.get(2));
             if (redisLock.unlock())
                 log.info("DELAY_QUEUE THREAD {} UNLOCK SUCCESS!", Thread.currentThread().getName());
-            log.info("DELAY_QUEUE THREAD {} POP OBJECT {} {} {} ", Thread.currentThread().getName(), list.get(0), list.get(1), list.get(2));
             long p = (long) list.get(0);
             long q = (long) list.get(2);
             HashSet set = (HashSet) list.get(1);
@@ -88,8 +88,7 @@ public class RedisDelayQueue implements Queue, Serializable {
         while (map == null || map.size() == 0) {
             try {
                 TimeUnit.SECONDS.sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ignored) {
             }
             map = pop(1);
         }

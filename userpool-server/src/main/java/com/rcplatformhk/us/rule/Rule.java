@@ -64,15 +64,19 @@ public class Rule {
         return new Rule.Builder();
     }
 
-    public void flow(Task k) throws Exception {
+    public void flow(Task task) throws Exception {
         if (beforeAction && delay > 0)
             TimeUnit.SECONDS.sleep(delay);
         if (Objects.nonNull(behavior))
-            behavior.g(k);
+            behavior.update(task);
         if (this.save)
-            k.sink();
-        for (Rule rule : checkList(k)) {
-            rule.flow(k);
+            task.sink();
+        Set<Rule> rules = checkList(task);
+        if (CollectionUtils.isEmpty(rules) && !this.save) {
+            log.info("Task {} Discard!! Rule {}", task, this.getName());
+        }
+        for (Rule rule : rules) {
+            rule.flow(task);
         }
     }
 

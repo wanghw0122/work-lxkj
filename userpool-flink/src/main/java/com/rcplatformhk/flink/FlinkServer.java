@@ -82,7 +82,6 @@ public class FlinkServer {
                     .map((MapFunction<Protobuf3.DuckulaEvent, UserInfo>)
                             e -> Map2ObjectUtil.mapToObject(Maps.newHashMap(e.getAfterMap()), UserInfo.class))
                     .filter((FilterFunction<UserInfo>) value -> value.getGender() == 1);
-//            FlinkJedisPoolConfig conf = new FlinkJedisPoolConfig.Builder().setHost("172.26.220.197").setPort(6379).build();
 
             FlinkJedisClusterConfig conf = new FlinkJedisClusterConfig.Builder().setNodes(loadClusters())
                     .build();

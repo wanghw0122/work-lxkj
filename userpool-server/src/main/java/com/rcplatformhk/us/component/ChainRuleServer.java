@@ -76,7 +76,6 @@ public class ChainRuleServer {
             long seconds = DateUtil.minus(o.getUpdateTime(), o.getCreateTime());
             return seconds < 86400L;
         }).build();
-
         Rule new_user_test_pay = Rule.builder().name("new_user_test_pay").delay(newUserInConfigDto_minuteDelay * 60).behavior(task -> {
             UserInfo userInfo = task.getUserInfo();
             List<Map<String, Object>> mapList = rcUserService.getPayStatusById(userInfo.getId());

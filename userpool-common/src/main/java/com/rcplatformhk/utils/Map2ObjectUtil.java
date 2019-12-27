@@ -27,16 +27,12 @@ public class Map2ObjectUtil {
                     continue;
                 }
                 field.setAccessible(true);
+
                 FieldType[] fieldType = field.getAnnotationsByType(FieldType.class);
                 Default[] defaults = field.getAnnotationsByType(Default.class);
-
-                if (ArrayUtils.isEmpty(fieldType)) {
-                    if (ArrayUtils.isNotEmpty(defaults))
-                        field.set(obj, cast2Object(field.getType(), map.getOrDefault(field.getName(), defaults[0].value())));
-                    else
-                        field.set(obj, cast2Object(field.getType(), map.getOrDefault(field.getName(), null)));
-                } else
-                    field.set(obj, cast2Object(field.getType(), map.get(fieldType[0].field())));
+                String fieldName = ArrayUtils.isEmpty(fieldType) ? field.getName() : fieldType[0].field();
+                String defaultValue = ArrayUtils.isNotEmpty(defaults) ? defaults[0].value() : null;
+                field.set(obj, cast2Object(field.getType(), map.getOrDefault(fieldName, defaultValue)));
             }
             ValidationUtils.ValidationResult validationResult = ValidationUtils.validateEntity(obj);
             if (validationResult.isHasErrors()) {
