@@ -44,9 +44,10 @@ public class RedisDelayQueue implements Queue, Serializable {
         if (n <= 0) return res;
         int l = n - 1;
         List list;
+        String threadName = Thread.currentThread().getName();
         try {
             redisLock.blockLock(2L);
-            log.info("DELAY_QUEUE THREAD {} LOCK SUCCESS!", Thread.currentThread().getName());
+            log.info("DELAY_QUEUE THREAD {} LOCK SUCCESS!", threadName);
             list = redisTemplate.executePipelined(new SessionCallback() {
                 @Override
                 public List<Object> execute(RedisOperations redisOperations) throws DataAccessException {
@@ -57,15 +58,15 @@ public class RedisDelayQueue implements Queue, Serializable {
                     return null;
                 }
             });
-            log.info("DELAY_QUEUE THREAD {} POP OBJECT {} {} {} ", Thread.currentThread().getName(), list.get(0), list.get(1), list.get(2));
+            log.info("DELAY_QUEUE THREAD {} POP OBJECT {} {} {} ", threadName, list.get(0), list.get(1), list.get(2));
             if (redisLock.unlock())
-                log.info("DELAY_QUEUE THREAD {} UNLOCK SUCCESS!", Thread.currentThread().getName());
+                log.info("DELAY_QUEUE THREAD {} UNLOCK SUCCESS!", threadName);
             long p = (long) list.get(0);
             long q = (long) list.get(2);
             HashSet set = (HashSet) list.get(1);
             if (p == 0L || q == 0L) return null;
             else assert set != null && q >= 1L;
-            log.info(MessageFormat.format("DELAY_QUEUE THREAD {0} POP OBJECT {1} SUCCESS!", Thread.currentThread().getName(), set));
+            log.info(MessageFormat.format("DELAY_QUEUE THREAD {0} POP OBJECT SUCCESS!", threadName));
             set.stream().filter(Objects::nonNull).forEach(o -> {
                 ZSetOperations.TypedTuple typedTuple1 = (ZSetOperations.TypedTuple) o;
                 UserInfo userInfo = (UserInfo) typedTuple1.getValue();
@@ -73,10 +74,10 @@ public class RedisDelayQueue implements Queue, Serializable {
                 res.put(userInfo, score);
             });
         } catch (Exception e) {
-            log.error(MessageFormat.format("DELAY_QUEUE THREAD {0} POP OBJECT ERROR!! MSG:{1}", Thread.currentThread().getName(), e.getMessage(), e));
+            log.error(MessageFormat.format("DELAY_QUEUE THREAD {0} POP OBJECT ERROR!! MSG:{1}", threadName, e.getMessage(), e));
         } finally {
             if (redisLock.unlock()) {
-                log.info("DELAY_QUEUE THREAD {} UNLOCK SUCCESS!", Thread.currentThread().getName());
+                log.info("DELAY_QUEUE THREAD {} UNLOCK SUCCESS!", threadName);
             }
         }
         return res;
