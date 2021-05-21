@@ -16,7 +16,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <flink.version>1.9.1</flink.version>
+        <flink.version>1.9.2</flink.version>
         <io.lettuce.version>5.1.4.RELEASE</io.lettuce.version>
         <redis.clients.version>2.9.0</redis.clients.version>
         <commons.lang3.version>3.7</commons.lang3.version>
